@@ -1,0 +1,129 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commitmortem</title><style>
+:root{--bg:#0d0a12;--s1:#17111f;--s2:#1f1729;--bd:#3a2c4a;--ink:#ece0c8;--mu:#a99bb8;--am:#f2b441;--mg:#ff8a1f;--vi:#9a7fd1;--rd:#ff8a8a;--r:12px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 480px at 50% -140px,#2f1c45,transparent),var(--bg);color:var(--ink);font:16px/1.55 "Iowan Old Style","Palatino Linotype",Georgia,serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+header,main{position:relative;max-width:1000px;margin:auto;padding:0 16px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:20px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:10px}.brand .fl{display:block;margin:0}.brand b{text-shadow:0 0 18px #f2b44180;font-size:2.1rem;letter-spacing:.06em;color:var(--am)}.brand small{color:var(--mu);display:block;font-size:.8rem}
+.mu{color:var(--mu)}.small{font-size:.85rem}h2,h3{font-weight:600;margin:.2em 0 .4em}h2{color:var(--am)}.mono,code,pre{font-family:ui-monospace,Consolas,monospace}
+.card{position:relative;background:linear-gradient(180deg,var(--s2),var(--s1));border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin:14px 0;box-shadow:inset 0 0 0 4px var(--s1),inset 0 0 0 5px #3a2c4a99,0 10px 30px #0007}
+.chip{border:1px solid var(--am);border-radius:999px;padding:4px 14px;font-size:.9rem;background:#f2b44114}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}input{font:inherit;color:var(--ink);background:#0d0a12;border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
+.btn{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:8px;padding:10px 18px;color:#1a0f06;background:linear-gradient(#ffc15a,#f08a1c)}.btn:disabled{opacity:.55;cursor:progress}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--bd)}.lnk{background:none;border:0;color:var(--am);text-decoration:underline;font:inherit;cursor:pointer;padding:0}
+:focus-visible{outline:3px solid #ffd479;outline-offset:2px}.sr{position:absolute;left:-9999px}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--bd);margin-top:18px}.tab{font:inherit;color:var(--mu);background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected=true]{color:var(--am);border-color:var(--mg)}
+.bar{height:14px;background:#1b0f14;overflow:hidden;margin:12px 0;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}.bar i{display:block;height:100%;width:35%;background:linear-gradient(90deg,#b3261e,var(--mg),var(--am));animation:sl 1.4s ease-in-out infinite alternate}@keyframes sl{to{margin-left:65%}}
+.alert{border:1px solid var(--rd);background:#3a151b;border-radius:8px;padding:12px;margin:10px 0}.ok{border-color:#7ed99a;background:#12301e}.warn{border-color:var(--am);background:#33260d}
+.epi{white-space:pre-wrap;font-style:italic;border-left:3px solid var(--mg);padding-left:14px;margin:8px 0}
+.candles{display:flex;gap:16px;overflow-x:auto;padding:6px 2px 12px;margin:0;list-style:none}.cd{flex:0 0 120px;text-align:center;font-size:.8rem}.cd b{display:block;font-weight:600;font-size:.85rem}
+.wax{width:16px;height:42px;margin:0 auto;border-radius:3px;background:linear-gradient(90deg,#d9c9a8,#f4ead2,#cdbb98)}.fl{width:12px;height:20px;margin:0 auto -2px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(#fff4c4,var(--am) 55%,transparent 72%);box-shadow:0 0 14px #f2b44180;animation:fk 1.3s ease-in-out infinite alternate}
+@keyframes fk{to{transform:scale(1.15,.88) rotate(3deg);opacity:.85}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.frame{border:1px solid var(--am);border-radius:8px;padding:14px;background:#120d18;outline:1px solid #f2b44140;outline-offset:3px}
+.mg{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}.mg i{width:9px;height:9px;border-radius:50%;background:radial-gradient(var(--am),var(--mg))}
+.msg{background:#120d18;border:1px solid var(--bd);border-radius:10px;padding:12px;margin:10px 0}.you{border-color:var(--vi)}
+.lab{display:inline-block;font-size:.78rem;color:#1a0f06;background:var(--am);border-radius:4px;padding:1px 8px;margin-bottom:6px}.ref{color:var(--am);font-weight:700}
+.cite{border-top:1px dashed var(--bd);margin-top:8px;padding-top:6px;font-size:.88rem;color:var(--mu)}.cite div{margin:3px 0}
+.sev{display:inline-block;font-weight:700;font-size:.8rem;border-radius:4px;padding:1px 8px;border:1px solid}.s-high{color:var(--rd)}.s-medium{color:var(--am)}.s-low{color:#b9a3ee}
+.h{border-left:4px solid var(--bd);background:#120d18;border-radius:8px;padding:10px 14px;margin:10px 0}.h.high{border-color:var(--rd)}.h.medium{border-color:var(--am)}.h.low{border-color:var(--vi)}
+.df{background:#0d0a12;border:1px solid var(--bd);border-radius:8px;padding:10px;overflow-x:auto;font-size:.85rem;margin:8px 0}.df div{white-space:pre}.df .a{background:#163a22;color:#bff5cb}.df .d{background:#43202a;color:#ffd0d0}.df .k{color:var(--vi)}
+.st{border-left:2px solid var(--bd);margin:6px 0 6px 6px;padding:2px 0 2px 14px}pre{white-space:pre-wrap;word-break:break-word;font-size:.82rem;background:#0d0a12;padding:8px;border-radius:6px;overflow-x:auto}details summary{cursor:pointer;color:var(--mu)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(380px circle at var(--x,50%) var(--y,-120px),#f2b44120,transparent 65%)}
+.card::before,.card::after{content:"";position:absolute;width:26px;height:26px;pointer-events:none;border:2px solid var(--am)}.card::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:12px}.card::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:12px}
+.min{padding:12px 18px}.min .intro{display:none}.min .alert{margin:8px 0 0}
+.tab{font-variant:small-caps;letter-spacing:.08em;font-size:1.05rem}.tab[aria-selected=true]{text-shadow:0 0 12px #f2b44199}
+.candles{border-bottom:3px solid #6b4a2a;box-shadow:0 10px 14px -10px #f2b44180}
+.frame{text-align:center;border-radius:70px 70px 8px 8px;padding-top:20px}.frame .mg{justify-content:center}
+.ini{width:46px;height:46px;margin:0 auto 6px;border-radius:50%;border:2px solid var(--am);display:grid;place-items:center;font-size:1.4rem;color:var(--am);background:radial-gradient(#2f1f42,#120d18)}
+svg.gl{display:block;margin:0 auto 4px}
+.bunt{height:22px;border-top:2px solid #6b4a2a;opacity:.85;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='22'%3E%3Cpath d='M0 0h24L12 22z' fill='%23f2b441' fill-opacity='.75'/%3E%3Cpath d='M24 0h24L36 22z' fill='%239a7fd1' fill-opacity='.75'/%3E%3Cpath d='M48 0h24L60 22z' fill='%23ff8a1f' fill-opacity='.75'/%3E%3C/svg%3E") repeat-x}
+.altar{position:relative;margin-top:22px;padding-top:6px}.cord{position:absolute;top:6px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#8a6a3a,#8a6a3a,transparent)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;border:0;margin:0;overflow:visible;padding-top:10px}
+.pw{transform-origin:50% 0;animation:sw 7s ease-in-out infinite alternate}.pw:nth-child(2){animation-delay:-2s}.pw:nth-child(3){animation-delay:-4s}.pw:nth-child(4){animation-delay:-1s}@keyframes sw{to{transform:rotate(.9deg)}}
+.pw.on{filter:drop-shadow(0 0 16px #f2b441aa)}
+.pc{display:block;width:100%;min-height:176px;padding:22px 8px 16px;border:1px solid var(--bd);border-radius:3px;text-align:center;color:var(--mu);cursor:pointer;transition:transform .25s,color .25s;
+ background:radial-gradient(circle at 50% 9px,#c9a15a 0 3px,transparent 4px),linear-gradient(#1c1326,#130e19);
+ clip-path:polygon(0 0,100% 0,100% 96%,90% 100%,80% 96%,70% 100%,60% 96%,50% 100%,40% 96%,30% 100%,20% 96%,10% 100%,0 96%)}
+.pc span{display:block}.pc .nm{font-variant:small-caps;letter-spacing:.06em;font-size:1.05rem;margin-top:4px}.pc .vb{font-size:.82rem;opacity:.85}
+.pc .stamp{display:inline-block;margin-top:8px;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;padding:1px 8px;border-radius:3px;transform:rotate(-4deg)}
+.pc:not(:disabled):hover{transform:translateY(4px);color:var(--ink)}.pc:disabled{cursor:not-allowed;opacity:.6}
+.pc:focus-visible{outline:3px solid #ffd479;outline-offset:-12px}
+.pc[aria-selected=true]{color:#2b1a3a;border-color:var(--am);text-shadow:none;background:radial-gradient(circle at 50% 9px,#6b4a2a 0 3px,transparent 4px),linear-gradient(#f7ecd4,#dcc89a)}
+@media(max-width:640px){.tabs{grid-template-columns:repeat(2,1fr)}.pc{min-height:150px}}
+@media(max-width:640px){.row{flex-direction:column}.btn{width:100%}.brand .fl{display:block;margin:0}.brand b{font-size:1.3rem}}
+@media(prefers-reduced-motion:reduce){.fl,.bar i,.pw{animation:none}body::after{display:none}}
+</style></head><body><div class="bunt" aria-hidden="true"></div>
+<header><div class="brand"><span class="fl" aria-hidden="true"></span><div><b>Commitmortem</b><small>A post-mortem for abandoned code</small></div></div><div id="chip" class="chip" hidden></div></header>
+<main><section class="card" id="entry" aria-labelledby="eh"><h2 class="intro" id="eh">Light a candle for a forgotten repository</h2>
+<p class="mu intro">Enter a public GitHub URL or a local path. Commitmortem reads its commits and issues, builds a memorial page, and lets you question its history. Four processes wait below, sealed until you scan.</p>
+<form id="f" class="row"><label class="sr" for="src">Repository URL or local path</label><input id="src" autocomplete="off" spellcheck="false" placeholder="https://github.com/owner/repo"><button class="btn" id="go">Scan</button></form>
+<p class="mu small intro">No repo handy? <button class="lnk" id="smp" type="button">Use demo/sample-dead-repo</button> (create it first with <code>python3 demo/make_fixture.py</code>).</p>
+<div class="candles intro" aria-hidden="true" style="justify-content:center"><div class="cd"><div class="fl"></div><div class="wax"></div></div><div class="cd"><div class="fl"></div><div class="wax"></div></div><div class="cd"><div class="fl"></div><div class="wax"></div></div><div class="cd"><div class="fl"></div><div class="wax"></div></div><div class="cd"><div class="fl"></div><div class="wax"></div></div></div><div id="sc" aria-live="polite"></div></section>
+<div id="app"><nav class="altar" aria-label="Choose a process"><div class="cord" aria-hidden="true"></div><div class="tabs" role="tablist" aria-label="Processes"></div></nav><div id="pn" hidden><div id="p-of" role="tabpanel" aria-labelledby="t-of"></div><div id="p-se" role="tabpanel" aria-labelledby="t-se" hidden></div><div id="p-re" role="tabpanel" aria-labelledby="t-re" hidden></div><div id="p-rs" role="tabpanel" aria-labelledby="t-rs" hidden></div></div></div><div id="live" class="sr" aria-live="polite"></div></main>
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={repo:null,tab:'of',cache:{},seed:[]},T=[['of','Ofrenda','I','Remember'],['se','Séance','II','Ask'],['re','Haunting report','III','Inspect'],['rs','Resurrect','IV','Attempt']];
+const say=t=>$('#live').textContent=t;
+async function api(p,b){let r,j;try{r=await fetch(p,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:undefined)}catch(e){throw new Error('NET')}
+ try{j=await r.json()}catch(e){throw new Error('The server sent an unreadable response.')}
+ if(!r.ok||j.error)throw new Error(j.error||'Request failed ('+r.status+').');return j}
+const em=e=>e.message==='NET'?'Cannot reach the Commitmortem server. Start it with python3 -m server.app, then retry.':e.message;
+const alertBox=(e,act)=>`<div class="alert" role="alert"><b>Something went wrong.</b> ${esc(em(e))}${act?` <button class="btn ghost" data-act="${act}">Retry</button>`:''}</div>`;
+const wait=t=>`<div class="card" aria-busy="true"><p>${t}</p><div class="bar"><i></i></div></div>`;
+const next=(to,t)=>`<p style="text-align:right"><button class="btn" data-go="${to}">${t}</button></p>`;
+const d10=s=>esc((s||'').slice(0,10));
+$('#f').onsubmit=async e=>{e.preventDefault();const v=$('#src').value.trim(),sc=$('#sc');
+ if(!v){sc.innerHTML='<div class="alert" role="alert">Enter a GitHub URL or a local path to scan.</div>';return}
+ $('#go').disabled=true;lock(true);$('#pn').hidden=true;T.forEach(t=>st(t[0],'Sealed'));S.cache={};document.querySelectorAll("#pn>div").forEach(d=>d.innerHTML="");sc.innerHTML=wait('Reading history... large repositories can take up to a minute.');
+ try{const r=await api('/api/scan',{source:v});S.repo=r.repo_id;
+  $('#chip').hidden=false;$('#chip').innerHTML=`<b>${esc(r.name)}</b> · ${r.commits} commits · ${r.contributors} contributors${r.issues?` · ${r.issues} issues`:''}`;
+  sc.innerHTML=`<div class="alert ok" role="status">Scan complete: ${r.commits} commits from ${r.contributors} contributors${r.issues?` and ${r.issues} issues`:' (issues are fetched only for GitHub URLs)'}.</div>`;
+  $('#entry').classList.add('min');say('Scan complete');lock(false);$('#pn').hidden=false;T.forEach(t=>st(t[0],'Ready'));show('of')}
+ catch(x){sc.innerHTML=alertBox(x)+'<p class="mu small">Check the URL is a public GitHub repo (https://github.com/owner/repo) or a valid local path.</p>'}
+ $('#go').disabled=false};
+$('#smp').onclick=()=>{$('#src').value='demo/sample-dead-repo';$('#src').focus()};
+const G={"of": "<path d=\"M24 6c4 6 5 9 0 13-5-4-4-7 0-13z\"/><rect x=\"19\" y=\"22\" width=\"10\" height=\"22\" rx=\"2\"/><path d=\"M10 52h28M14 58h20\"/>", "se": "<path d=\"M12 58V28a12 12 0 0124 0v30l-6-5-6 5-6-5z\"/><circle cx=\"19\" cy=\"30\" r=\"2\"/><circle cx=\"29\" cy=\"30\" r=\"2\"/>", "re": "<path d=\"M12 58V26a12 12 0 0124 0v32z\"/><path d=\"M24 16l-4 10 6 6-5 8\"/>", "rs": "<path d=\"M24 58V34M24 34c-8-2-10-10-10-14 8 0 10 6 10 14zM24 38c6-2 9-8 9-12-7 0-9 5-9 12z\"/><path d=\"M12 60h24\"/>"};
+$('.tabs').innerHTML=T.map(([k,n,r,v])=>`<div class="pw" role="presentation"><button class="tab pc" role="tab" id="t-${k}" data-tab="${k}" aria-controls="pn" aria-selected="false" title="Scan a repository to unseal this process"><svg class="gl" viewBox="0 0 48 64" width="44" height="58" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${G[k]}</svg><span class="nm">${r}. ${n}</span><span class="vb">${v}</span><span class="stamp" id="st-${k}">Sealed</span></button></div>`).join('');
+const st=(k,t)=>{const e=$('#st-'+k);if(e)e.textContent=t},lock=on=>document.querySelectorAll('.tab').forEach(b=>{b.disabled=on;b.title=on?'Scan a repository to unseal this process':''});lock(true);
+function show(k){S.tab=k;document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===k;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;b.parentElement.classList.toggle('on',on)});
+ document.querySelectorAll('#pn>div').forEach(d=>d.hidden=d.id!=='p-'+k);({of:ofr,se:sea,re:rep,rs:res})[k]()}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-go],[data-act],[data-q]');if(!t)return;
+ if(t.dataset.tab||t.dataset.go){show(t.dataset.tab||t.dataset.go);scrollTo({top:$('.tabs').offsetTop-8})}
+ else if(t.dataset.act)({of:ofr,re:rep,rs:run})[t.dataset.act](true);else if(t.dataset.q)ask(t.dataset.q)});
+$('.tabs').onkeydown=e=>{if(!S.repo)return;const i=T.findIndex(x=>x[0]===S.tab),j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:null;if(j===null)return;const k=T[(j+4)%4][0];show(k);$('#t-'+k).focus()};
+async function ofr(force){const pn=$('#p-of');if(S.cache.of&&!force)return;pn.innerHTML=wait('Lighting the candles...');
+ try{const o=await api('/api/ofrenda?repo='+S.repo);S.seed=o.candles.slice(0,2).map(c=>c.label);const i=o.issues||{open:0,unanswered:[]};
+  const h=`<section class="card"><h2>${esc(o.repo.name)}</h2><p class="mu small">${esc(o.repo.url)} · ${o.commit_count} commits · ${o.frames.length} contributors</p><p class="mu small">Calavera epitaph, a verse for the project (never its people):</p><div class="epi">${esc(o.epitaph)}</div></section>
+  <section class="card"><h3>Milestone candles</h3><p class="mu small">One candle for each milestone commit, picked by keywords and size of change.</p><ol class="candles">${o.candles.map(c=>`<li class="cd"><div class="fl" aria-hidden="true"></div><div class="wax" aria-hidden="true"></div><span class="mono">${esc(c.sha.slice(0,7))}</span><br>${d10(c.date)}<b>${esc(c.label)}</b></li>`).join('')}</ol></section>
+  <section class="card"><h3>Remembered contributors</h3><div class="grid">${o.frames.map(f=>`<article class="frame"><div class="ini" aria-hidden="true">${esc([...f.name][0]||"?").toUpperCase()}</div><h4 style="margin:0">${esc(f.name)}</h4><div class="mu small">${f.commit_count} commits · ${d10(f.first_commit)} to ${d10(f.last_commit)}</div><p>${esc(f.remembrance)}</p><div class="mg" role="img" aria-label="Activity: ${f.marigolds} marigolds">${'<i></i>'.repeat(Math.min(f.marigolds,60))}</div></article>`).join('')}</div></section>
+  <section class="card"><h3>Unanswered prayers</h3>${i.open?`<p class="mu small">${i.open} open issue${i.open>1?'s':''} still waiting${i.open>i.unanswered.length?' (newest '+i.unanswered.length+' shown)':''}:</p><ul>${i.unanswered.map(x=>`<li><span class="ref">#${x.number}</span> ${esc(x.title)}</li>`).join('')}</ul>`:'<p class="mu">No open issues were found. (Issues are only fetched for public GitHub URLs.)</p>'}</section>`+next('se','Next: ask the ghost a question');
+  S.cache.of=1;pn.innerHTML=h;st('of','Opened')}catch(x){pn.innerHTML=alertBox(x,'of');st('of','Failed')}}
+const lbl='AI imitation based on public commits.';
+function sea(){const pn=$('#p-se');if(S.cache.se)return;S.cache.se=1;st('se','Opened');const q=['Tell me about this project\u2019s history.',...S.seed.map(l=>'What do you remember about "'+l.slice(0,60)+'"?')];
+ pn.innerHTML=`<section class="card"><h2>Séance</h2><div class="alert warn" role="note"><b>${lbl}</b> The ghost answers only from retrieved commits and issues, and cites them. It never invents personal details.</div>
+ <p class="mu small">Suggested questions, built from this repository\u2019s own milestones:</p><p>${q.map(x=>`<button class="btn ghost" data-q="${esc(x)}">${esc(x)}</button> `).join('')}</p>
+ <div id="log" aria-live="polite"></div><form id="qf" class="row"><label class="sr" for="q">Question for the ghost</label><input id="q" autocomplete="off" placeholder="Ask about a commit, a bug, a decision..."><button class="btn">Ask</button></form></section>`+next('re','Next: read the haunting report');
+ $('#qf').onsubmit=e=>{e.preventDefault();const v=$('#q').value.trim();if(v){$('#q').value='';ask(v)}}}
+async function ask(q){const lg=$('#log');if(!lg)return;lg.insertAdjacentHTML('beforeend',`<div class="msg you"><b>You:</b> ${esc(q)}</div>`);
+ const id='a'+Date.now();lg.insertAdjacentHTML('beforeend',`<div class="msg" id="${id}" aria-busy="true">The ghost is listening...</div>`);
+ try{const r=await api('/api/seance',{repo:S.repo,question:q}),none=!r.citations.length;
+  const txt=esc(r.answer).replace(/\[(commit|issue):([^\]]+)\]/g,'<span class="ref">[$1:$2]</span>');
+  $('#'+id).outerHTML=`<div class="msg"><span class="lab">${esc(String(r.label).replace(/[\[\]]/g,''))}</span><p style="margin:.2em 0">${txt}</p>${none?'<p class="mu small">Nothing in the commits or issues matched, so the ghost stays silent instead of guessing. Try naming a file, a feature or a commit message.</p>':`<div class="cite"><b>Cited from the repository:</b>${r.citations.map(c=>`<div><span class="ref mono">[${esc(c.ref)}]</span> ${d10(c.date)}${c.author?' · '+esc(c.author):''} — ${esc(c.text)}</div>`).join('')}</div>`}</div>`}
+ catch(x){$('#'+id).outerHTML=alertBox(x)}}
+async function rep(force){const pn=$('#p-re');if(S.cache.re&&!force)return;pn.innerHTML=wait('Listening for hauntings...');
+ try{const r=await api('/api/report?repo='+S.repo),n=k=>r.filter(x=>x.severity===k).length,ic={high:'▲ High',medium:'◆ Medium',low:'● Low'};
+  const h=`<section class="card"><h2>Haunting report</h2><p class="mu">${r.length?`${r.length} haunting${r.length>1?'s':''}: ${n('high')} high, ${n('medium')} medium, ${n('low')} low.`:'No hauntings were detected by the current checks. This does not prove the code is healthy.'}</p>
+  ${r.map(x=>`<article class="h ${esc(x.severity)}"><span class="sev s-${esc(x.severity)}">${ic[x.severity]||esc(x.severity)}</span> <b>${esc(x.haunting)}</b><div class="mono small" style="margin:4px 0">${esc(x.file)}:${x.line}</div><div>${esc(x.note)}</div><div class="mu small"><b>Suggested exorcism:</b> ${esc(x.fix)}</div></article>`).join('')}</section>`+next('rs','Next: attempt a resurrection');
+  S.cache.re=1;pn.innerHTML=h;st('re',r.length?r.length+' found':'None found')}catch(x){pn.innerHTML=alertBox(x,'re');st('re','Failed')}}
+function res(){const pn=$('#p-rs');if(S.cache.rs)return;S.cache.rs=1;
+ pn.innerHTML=`<section class="card"><h2>Resurrection</h2><p>An agent copies the repository into a temporary sandbox, runs its checks, and tries up to three small fixes.</p><p class="mu small"><b>Sandbox only. Nothing is pushed or published</b>, and your original files are not changed.</p><button class="btn" data-act="rs">Attempt resurrection</button><div id="rr" aria-live="polite"></div></section>`}
+async function run(){const rr=$('#rr'),b=document.querySelector('[data-act=rs]');if(b)b.disabled=true;rr.innerHTML=wait('The agent is working in the sandbox...');
+ try{const r=await api('/api/resurrect',{repo:S.repo}),ok=r.ok===true;st('rs',ok?'Revived':'Not revived');
+  const df=(r.diff||'').split('\n').map(l=>`<div class="${l[0]==='+'&&l[1]!=='+'?'a':l[0]==='-'&&l[1]!=='-'?'d':l[0]==='@'?'k':''}">${esc(l)||' '}</div>`).join('');
+  const st=(r.steps||[]).map(s=>s.note?`<div class="st mu">${esc(s.note)}</div>`:s.applied?`<div class="st"><b>Patch applied</b> to <span class="mono">${esc(s.applied.file)}</span></div>`:`<div class="st"><span class="mono">${esc(s.command)}</span> — ${s.exit===0?'passed':'failed'} (exit ${s.exit})${s.log?`<details><summary>Output</summary><pre>${esc(s.log)}</pre></details>`:''}</div>`).join('');
+  rr.innerHTML=`<div class="alert ${ok?'ok':'warn'}" role="status"><b>${ok?'Resurrected':'Not revived'}.</b> ${esc(r.report||'')}</div>${r.detected?`<p class="mu small">Check used: <span class="mono">${esc(r.detected)}</span> (${esc(r.reason)}). Sandbox only, nothing pushed.</p>`:''}
+  <h3>Agent steps</h3>${st||'<p class="mu">No steps were run.</p>'}<h3>Changes</h3>${r.diff?`<div class="df" tabindex="0" role="region" aria-label="Diff">${df}</div>`:'<p class="mu">No changes were made.</p>'}`;
+}catch(x){rr.innerHTML=alertBox(x,'rs');st('rs','Failed')}if(b)b.disabled=false}
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)addEventListener('pointermove',e=>{document.body.style.setProperty('--x',e.clientX+'px');document.body.style.setProperty('--y',e.clientY+'px')});
+</script></body></html>
