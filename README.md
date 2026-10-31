@@ -4,9 +4,6 @@
 
 Built for the **Ghost in the Machine** challenge with **Gemma 4** and an open skill harness.
 
-> Ghost output is always labeled: **AI imitation based on public commits.**
-
-![Commitmortem start screen](docs/screenshots/01-start.png)
 
 ## What it does
 
@@ -17,8 +14,6 @@ Built for the **Ghost in the Machine** challenge with **Gemma 4** and an open sk
 | **III. Haunting report** | Technical debt phrased as hauntings, each with a severity, a real file and line, and a suggested fix |
 | **IV. Resurrect** | An agent copies the repo into a sandbox, runs its checks, tries up to 3 small fixes, and shows the steps, logs and diff. It never pushes anything |
 
-![Ofrenda](docs/screenshots/02-ofrenda.png)
-![Séance](docs/screenshots/03-seance.png)
 
 ## Architecture at a glance
 
